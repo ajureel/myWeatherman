@@ -11,9 +11,10 @@
 // https://dev.virtualearth.net/REST/v1/Locations/US////Detroit?key=AvJLVKfSRJ7aAjDDkx98DqX8n6LbtMBGWY4MA0HZDaS-y6W5ZHnl-8XveLmmXQs7
 
 // Elements
-var citySearchInput = document.getElementById('searchCity');
-var citySearchBtn = document.getElementById('citySearchBtn');
-var currentConditionsDiv = document.getElementById('currentConditions');
+var citySearchInputEl = document.getElementById('searchCity');
+var citySearchBtnEl = document.getElementById('citySearchBtn');
+var currentConditionsDivEl = document.getElementById('currentConditions');
+var forecastRowEl = document.getElementById('forecastRow');
 
 // City data
 var city = '';
@@ -58,7 +59,7 @@ function getWeatherApi() {
       console.log(data);
       console.log("city: " + city);
 
-      currentConditionsDiv.innerHTML = '';
+      currentConditionsDivEl.innerHTML = '';
 
       // presented with current and future conditions for that city
         var currentTitleP = document.createElement('p');
@@ -68,7 +69,9 @@ function getWeatherApi() {
         var currentWind = document.createElement('p');
         var currentHumidity = document.createElement('p');
         var currentUVIndex = document.createElement('p');
-        currentTitleHeader.innerText = city;
+        
+        var myDate = new Date(data.current.dt*1000-(data.timezone_offset*1000))
+        currentTitleHeader.innerText = city + ": " + myDate.toDateString();
         var iconcode = data.current.weather[0].icon;
         var iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
         currentIcon.setAttribute("src", iconurl);
@@ -79,24 +82,44 @@ function getWeatherApi() {
         currentHumidity.innerText = "Humidity: " + data.current.humidity + "%";
         currentUVIndex.innerText = "UV Index: " + data.current.uvi ;
 
-        currentConditionsDiv.append(currentTitleP, currentTemp, currentWind, currentHumidity, currentUVIndex);
+        currentConditionsDivEl.append(currentTitleP, currentTemp, currentWind, currentHumidity, currentUVIndex);
         
         // 5 Day Forecast
-        
+        forecastRowEl.innerHTML = '';
 
-    //   for (var i = 0; i < data.length; i++) {
-    //     //Creating a h3 element and a p element
-    //     var userName = document.createElement('h3');
-    //     var userUrl = document.createElement('p');
+        for (var i = 1; i < 6; i++) {
+            var forecastColEl = document.createElement('div');
+            var forecastCardEl = document.createElement('div');
+            var forecastDate = document.createElement('p');
+            var forecastIcon = document.createElement('img');
+            var forecastTemp = document.createElement('p');
+            var forecastWind = document.createElement('p');
+            var forecastHumidity = document.createElement('p');
 
-    //     //Setting the text of the h3 element and p element.
-    //     userName.textContent = data[i].login;
-    //     userUrl.textContent = data[i].url;
+            forecastColEl.setAttribute("class", "col col-sm-12 col-md-2");
+            forecastCardEl.setAttribute("class", "card bg-primary text-white");
 
-    //     //Appending the dynamically generated html to the div associated with the id="users"
-    //     //Append will attach the element as the bottom most child.
-    //     usersContainer.append(userName);
-    //     usersContainer.append(userUrl);
+            // Test the date format
+            //console.log(new Date(data.daily[i].dt*1000-(data.timezone_offset*1000))); // minus 
+            //console.log(new Date(data.daily[i].dt*1000+(data.timezone_offset*1000))); // plus
+
+            myDate = new Date(data.daily[i].dt*1000-(data.timezone_offset*1000));
+            console.log(i + " " + myDate.toDateString());
+            forecastDate.innerText = myDate.toDateString();
+            iconcode = data.daily[i].weather[0].icon;
+            iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+            forecastIcon.setAttribute("src", iconurl);
+            forecastIcon.setAttribute("alt", "weather icon");
+            forecastIcon.setAttribute("width", "50%");
+            forecastTemp.innerText = "High: " + data.daily[i].temp.max + " Fahrenheit";
+            forecastWind.innerText = "Wind: " + data.daily[i].wind_speed + " mph";
+            forecastHumidity.innerText = "Humidity: " + data.daily[i].humidity + "%";
+
+            forecastCardEl.append(forecastDate, forecastIcon, forecastTemp, forecastWind, forecastHumidity);
+            forecastColEl.append(forecastCardEl);
+
+            forecastRowEl.append(forecastColEl);
+        };
        })
     // .then(cleanUp()
     // );
@@ -110,7 +133,7 @@ var cleanUp = function(){
     addToHistory();
 
     // clean up var and inputs until next time
-    citySearchInput.value = '';
+    citySearchInputEl.value = '';
     city = '';
     lat = '';
     lon = '';
@@ -120,7 +143,7 @@ var addToHistory=function(){
 
 }
 
-citySearchBtn.addEventListener('click', getCityInfoApi);
-//console.log (citySearchBtn);
+citySearchBtnEl.addEventListener('click', getCityInfoApi);
+//console.log (citySearchBtnEl);
 //getCityInfoApi();
 //getWeatherApi("Detroit");
