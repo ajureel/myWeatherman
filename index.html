@@ -24,7 +24,7 @@
                     <h2>Search for a City:</h2>
                     <input type="test" class="form-control" id="searchCity">
                 </div>
-                <button class="btn btn-block btn-primary" type="button" value="Input" >Search</button>
+                <button class="btn btn-block btn-primary" type="button" id="citySearchBtn" value="Input" >Search</button>
                 
                 <hr>
                 <div id="searchResults">
@@ -34,61 +34,12 @@
             </div>
             <!-- Right Column -->
             <div class="col col-sm-12 col-lg-10">
-                <div class="border border-primary">
-                    <div><h2>City Content Here</h2></div>
-                    <div>Temp</div>
-                    <div>Wind</div>
-                    <div>Humidity</div>
-                    <div>UV Index</div>
-
+                <div class="border border-primary" id="currentConditions">
+                    <!-- current conditions will be dynamically added here -->
                 </div>
                 <div><h3>5-Day Forecast:</h3></div>
-                <div class="row">
-                    <div class="col col-sm-12 col-md-2">
-                        <div class="card bg-primary text-white" >
-                            <div>Date</div>
-                            <div>Icon</div>
-                            <div>Temp</div>
-                            <div>Wind</div>
-                            <div>Hunidity</div>
-                        </div>
-                    </div>
-                    <div class="col col-sm-12 col-md-2">
-                        <div class="card bg-primary text-white" >
-                            <div>Date</div>
-                            <div>Icon</div>
-                            <div>Temp</div>
-                            <div>Wind</div>
-                            <div>Hunidity</div>
-                        </div>
-                    </div>
-                    <div class="col col-sm-12 col-md-2">
-                        <div class="card bg-primary text-white" >
-                            <div>Date</div>
-                            <div>Icon</div>
-                            <div>Temp</div>
-                            <div>Wind</div>
-                            <div>Hunidity</div>
-                        </div>
-                    </div>
-                    <div class="col col-sm-12 col-md-2">
-                        <div class="card bg-primary text-white" >
-                            <div>Date</div>
-                            <div>Icon</div>
-                            <div>Temp</div>
-                            <div>Wind</div>
-                            <div>Hunidity</div>
-                        </div>
-                    </div>
-                    <div class="col col-sm-12 col-md-2">
-                        <div class="card bg-primary text-white" >
-                            <div>Date</div>
-                            <div>Icon</div>
-                            <div>Temp</div>
-                            <div>Wind</div>
-                            <div>Hunidity</div>
-                        </div>
-                    </div>
+                <div class="row" id="forecastRow">
+                    <!-- 5 day forecast cards go here -->
                 </div>
             </div>
         </div>
@@ -101,4 +52,5 @@
         </div>
     </div>   
 </body>
+<script src="assets/js/script.js"></script>
 </html>
