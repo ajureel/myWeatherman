@@ -1,27 +1,82 @@
-// https://api.openweathermap.org/data/2.5/weather?q=Detroit&appid=244aa4153db3eb6e2f0064200dfe0f71
-// {"coord":{"lon":-83.0458,"lat":42.3314},"weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04n"}],"base":"stations","main":{"temp":273.55,"feels_like":269.66,"temp_min":271.97,"temp_max":274.35,"pressure":1018,"humidity":72},"visibility":10000,"wind":{"speed":3.58,"deg":244,"gust":8.49},"clouds":{"all":100},"dt":1641691177,"sys":{"type":2,"id":2006979,"country":"US","sunrise":1641646852,"sunset":1641680193},"timezone":-18000,"id":4990729,"name":"Detroit","cod":200}
-
-
-// api.openweathermap.org/data/2.5/onecall?lat=38.8&lon=12.09&callback=test
-
-//Bing map to get lat long
-//AvJLVKfSRJ7aAjDDkx98DqX8n6LbtMBGWY4MA0HZDaS-y6W5ZHnl-8XveLmmXQs7
-// http://dev.virtualearth.net/REST/v1/Locations/US/{adminDistrict}/{postalCode}/{locality}/{addressLine}?includeNeighborhood={includeNeighborhood}&include={includeValue}&maxResults={maxResults}&key={BingMapsKey}
-// http://dev.virtualearth.net/REST/v1/Locations/US///Detroit/?key=AvJLVKfSRJ7aAjDDkx98DqX8n6LbtMBGWY4MA0HZDaS-y6W5ZHnl-8XveLmmXQs7
-// https://dev.virtualearth.net/REST/v1/Locations/US////Detroit?key=AvJLVKfSRJ7aAjDDkx98DqX8n6LbtMBGWY4MA0HZDaS-y6W5ZHnl-8XveLmmXQs7
-
 // Elements
 var citySearchInputEl = document.getElementById('searchCity');
 var citySearchBtnEl = document.getElementById('citySearchBtn');
 var currentConditionsDivEl = document.getElementById('currentConditions');
 var forecastRowEl = document.getElementById('forecastRow');
+var searchResultsEl = document.getElementById('searchResults');
+
+var searchBtnsAry = new Array();
 
 // City data
 var city = '';
 var lat = '';
 var lon = '';
+var weatherHistory = [];
 
-//get the lat lon then get the weather!
+//Load History from local storage
+var loadHistory = function() {
+    weatherHistory = JSON.parse(localStorage.getItem("weatherHistory"));
+  
+    // if nothing in localStorage, return
+    if (!weatherHistory) {
+        weatherHistory = [];
+        return;
+    }
+    
+    // loop over object properties and add buttons
+    for (i=0; i<weatherHistory.length; i++){
+        // console.log(weatherHistory[i].city, weatherHistory[i].lat, weatherHistory[i].lon);
+        addCityBtn(weatherHistory[i].city, weatherHistory[i].lat, weatherHistory[i].lon);
+    };
+};
+
+// save history to local storage
+var saveHistory = function() {
+    console.log("saving");
+    localStorage.setItem("weatherHistory", JSON.stringify(weatherHistory));
+};
+
+// create history and buttons
+var createHistory = function (myCity, myLat, myLon){
+    console.log("create button and history");
+    // check to see if the city is already in our history
+    if (searchBtnsAry){
+        for(i=0; i<searchBtnsAry.length; i++){
+            if (searchBtnsAry[i].id==myCity){
+                console.log("test2");
+                return; //do not add duplicate history
+            }
+        }
+    }
+
+    //Add the button
+    addCityBtn(myCity, myLat, myLon);
+
+    //add to history array used to check for duplicates and save
+    weatherHistory.push({city:myCity, lat:myLat, lon:myLon});
+
+    //save history to local storage
+    saveHistory();
+}
+
+// function to add city buttons.  called from createHistory and from loadHistory
+var addCityBtn = function (myCity, myLat, myLon){
+    console.log("addCityBtn");
+    var cityBtn = document.createElement('button');
+    cityBtn.setAttribute("class", "btn btn-block btn-primary");
+    cityBtn.setAttribute("type", "button");
+    cityBtn.setAttribute("id", myCity);
+    cityBtn.setAttribute("data-lat", myLat);
+    cityBtn.setAttribute("data-lon", myLon);
+    cityBtn.innerText = myCity;
+
+    searchResultsEl.append(cityBtn);
+    searchBtnsAry.push(cityBtn);
+
+}
+    
+
+//get the lat lon then get the weather!  Used when searching for a new city
 var getCityInfoApi = function() {
     city = searchCity.value;
     console.log(city);  
@@ -42,12 +97,13 @@ var getCityInfoApi = function() {
 
         console.log (lat + ', ' + lon);
         getWeatherApi();
+        createHistory(city, lat, lon);
        });
   }
 
 
 function getWeatherApi() {
-    console.log("city1: " + city);
+    console.log("getWeatherApi: " + city);
   var requestUrl = 'https://api.openweathermap.org/data/2.5/onecall?lat=' + lat + '&lon=' + lon +'&exclude=hourly,minutely&units=imperial&appid=244aa4153db3eb6e2f0064200dfe0f71';
 
   fetch(requestUrl)
@@ -128,10 +184,17 @@ function getWeatherApi() {
      //cleanUp();
 }
 
-var cleanUp = function(){
-    // add city to history if needed
-    addToHistory();
+var reloadCity = function (myEvent){
+    var el = myEvent.target
+    
+    city = el.id;
+    lat = el.getAttribute('data-lat');
+    lon = el.getAttribute('data-lon');
+    console.log(city + " " + lat + " " +lon);
+    getWeatherApi();
+}
 
+var cleanUp = function(){
     // clean up var and inputs until next time
     citySearchInputEl.value = '';
     city = '';
@@ -139,11 +202,11 @@ var cleanUp = function(){
     lon = '';
 }
 
-var addToHistory=function(){
-
-}
 
 citySearchBtnEl.addEventListener('click', getCityInfoApi);
-//console.log (citySearchBtnEl);
-//getCityInfoApi();
-//getWeatherApi("Detroit");
+searchResultsEl.addEventListener('click', function (myEvent) {
+    reloadCity(myEvent);
+});
+//All functions are loaded... lets load some data!
+loadHistory();
+
