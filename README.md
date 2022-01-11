@@ -33,4 +33,4 @@ THEN I am again presented with current and future conditions for that city
 
 ## Mock-Up
 
-![Weather Dashboard Mockup](assets\img\06-server-side-apis-homework-demo.png)
+![Weather Dashboard Mockup](assets/img/06-server-side-apis-homework-demo.png)
